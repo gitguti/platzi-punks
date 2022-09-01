@@ -84,7 +84,7 @@ contract PlatziPunks is ERC721, ERC721Enumerable, Ownable, PlatziPunksDNA {
 
        bytes memory jsonURI = abi.encodePacked(
             '{ "name" : "Platzi Punks #', 
-            tokenId.toString(),
+            Strings.toString(tokenId),
             '", "description" : "Randomized Avatars", "image" : ',
             image,
             '"background_color": "80ed99"',
