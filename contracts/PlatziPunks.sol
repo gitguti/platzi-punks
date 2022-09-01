@@ -43,6 +43,7 @@ contract PlatziPunks is ERC721, ERC721Enumerable, Ownable, PlatziPunksDNA {
             '", "description" : "Randomized Avatars", "image" : ", '
             "// TODO : calculate images URL",
             '"background_color": "80ed99"',
+             '"attributes": [{"Accessories Type": "" ,"Clothe Color": "","Clothe Type":"","Eye Type":"","Eye Brow Type":"","Facial Hair Color":"","Facial Hair Type":"","Hair Color":"","Hat Color":"","Graphic Type":"","Mouth Type":"","Skin Color":"","Top Type":"",}]',
             '"}'
         ); 
 
