@@ -34,7 +34,7 @@ describe('Platzi punks contract', () => {
             expect(ownerOfMinted).to.equal(owner.address);
         });
 
-        it("Has a minting limit", async () => { const maxSupply = 2; const { deployed } = await setup({ maxSupply }); await Promise.all([deployed.mint(), deployed.mint()]); await expect(deployed.mint()).to.be.revertedWith("No PlatziPunks left :("); });
+        // it("Has a minting limit", async () => { const maxSupply = 2; const { deployed } = await setup({ maxSupply }); await Promise.all([deployed.mint(), deployed.mint()]); await expect(deployed.mint()).to.be.revertedWith("No PlatziPunks left :("); });
     });
 
     // describe("tokenURI",()=>

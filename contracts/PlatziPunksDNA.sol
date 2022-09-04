@@ -1,6 +1,6 @@
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 contract PlatziPunksDNA {
     string[] private _accessoriesType = [
@@ -201,35 +201,31 @@ contract PlatziPunksDNA {
         "ShortHairTheCaesarSidePart"
     ];
 
-    //this  pseudorandom function is deterministic and should not be used on production
-    function deterministicPseudoRandomDNA(uint256 _tokenId, address _minter)
-    public
-    pure
-    returns(uint256)
+    // TODO: Calculate DNA
+    function random(uint256 _tokenId, address _minter, uint256 _timestamp) internal pure returns(uint256)
     {
-        uint256 combinedParams =_tokenId + uint160(_minter);
-        bytes memory encodedParams = abi.encodePacked(combinedParams);
-        bytes32 hashedParams = keccak256(encodedParams);
-
-        return uint256(hashedParams);
+        uint256 _calc = _tokenId + uint160(_minter) + _timestamp;
+        bytes memory encodedParams = abi.encodePacked(_calc);
+        return uint256(keccak256(encodedParams));
     }
 
-    //get attributes
+    // Get attributes
     uint8 constant ADN_SECTION_SIZE = 2;
 
     function _getDNASection(uint256 _dna, uint8 _rightDiscard)
-        internal
+        private
         pure
         returns (uint8)
     {
-        return uint8(
-            (_dna % (1 * 10**(_rightDiscard + ADN_SECTION_SIZE))) /
-            (1 * 10**_rightDiscard)
-        );
+        return
+            uint8(
+                (_dna % (1 * 10**(_rightDiscard + ADN_SECTION_SIZE))) /
+                    (1 * 10**_rightDiscard)
+            );
     }
 
-   function getAccessoriesType(uint256 _dna)
-        public
+    function getAccesoriesType(uint256 _dna)
+        internal
         view
         returns (string memory)
     {
@@ -237,28 +233,28 @@ contract PlatziPunksDNA {
         return _accessoriesType[dnaSection % _accessoriesType.length];
     }
 
-    function getClotheColor(uint256 _dna) public view returns (string memory) {
+    function getClotheColor(uint256 _dna) internal view returns (string memory) {
         uint8 dnaSection = _getDNASection(_dna, 2);
         return _clotheColor[dnaSection % _clotheColor.length];
     }
 
-    function getClotheType(uint256 _dna) public view returns (string memory) {
+    function getClotheType(uint256 _dna) internal view returns (string memory) {
         uint256 dnaSection = _getDNASection(_dna, 4);
         return _clotheType[dnaSection % _clotheType.length];
     }
 
-    function getEyeType(uint256 _dna) public view returns (string memory) {
+    function getEyeType(uint256 _dna) internal view returns (string memory) {
         uint256 dnaSection = _getDNASection(_dna, 6);
         return _eyeType[dnaSection % _eyeType.length];
     }
 
-    function getEyeBrowType(uint256 _dna) public view returns (string memory) {
+    function getEyeBrowType(uint256 _dna) internal view returns (string memory) {
         uint256 dnaSection = _getDNASection(_dna, 8);
         return _eyebrowType[dnaSection % _eyebrowType.length];
     }
 
     function getFacialHairColor(uint256 _dna)
-        public
+        internal
         view
         returns (string memory)
     {
@@ -267,7 +263,7 @@ contract PlatziPunksDNA {
     }
 
     function getFacialHairType(uint256 _dna)
-        public
+        internal
         view
         returns (string memory)
     {
@@ -275,32 +271,32 @@ contract PlatziPunksDNA {
         return _facialHairType[dnaSection % _facialHairType.length];
     }
 
-    function getHairColor(uint256 _dna) public view returns (string memory) {
+    function getHairColor(uint256 _dna) internal view returns (string memory) {
         uint256 dnaSection = _getDNASection(_dna, 14);
         return _hairColor[dnaSection % _hairColor.length];
     }
 
-    function getHatColor(uint256 _dna) public view returns (string memory) {
+    function getHatColor(uint256 _dna) internal view returns (string memory) {
         uint256 dnaSection = _getDNASection(_dna, 16);
         return _hatColor[dnaSection % _hatColor.length];
     }
 
-    function getGraphicType(uint256 _dna) public view returns (string memory) {
+    function getGraphicType(uint256 _dna) internal view returns (string memory) {
         uint256 dnaSection = _getDNASection(_dna, 18);
         return _graphicType[dnaSection % _graphicType.length];
     }
 
-    function getMouthType(uint256 _dna) public view returns (string memory) {
+    function getMouthType(uint256 _dna) internal view returns (string memory) {
         uint256 dnaSection = _getDNASection(_dna, 20);
         return _mouthType[dnaSection % _mouthType.length];
     }
 
-    function getSkinColor(uint256 _dna) public view returns (string memory) {
+    function getSkinColor(uint256 _dna) internal view returns (string memory) {
         uint256 dnaSection = _getDNASection(_dna, 22);
         return _skinColor[dnaSection % _skinColor.length];
     }
 
-    function getTopType(uint256 _dna) public view returns (string memory) {
+    function getTopType(uint256 _dna) internal view returns (string memory) {
         uint256 dnaSection = _getDNASection(_dna, 24);
         return _topType[dnaSection % _topType.length];
     }

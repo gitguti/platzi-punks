@@ -1,7 +1,638 @@
+// Sources flattened with hardhat v2.11.0 https://hardhat.org
 // SPDX-License-Identifier: MIT
-// Sources flattened with hardhat v2.10.2 https://hardhat.org
+// File contracts/PlatziPunksDNA.sol
+
+pragma solidity ^0.8.4;
+
+contract PlatziPunksDNA {
+    string[] private _accessoriesType = [
+        "Blank",
+        "Kurt",
+        "Prescription01",
+        "Prescription02",
+        "Round",
+        "Sunglasses",
+        "Wayfarers"
+    ];
+
+    string[] private _clotheColor = [
+        "Black",
+        "Blue01",
+        "Blue02",
+        "Blue03",
+        "Gray01",
+        "Gray02",
+        "Heather",
+        "PastelBlue",
+        "PastelGreen",
+        "PastelOrange",
+        "PastelRed",
+        "PastelYellow",
+        "Pink",
+        "Red",
+        "White"
+    ];
+
+    string[] private _clotheType = [
+        "BlazerShirt",
+        "BlazerSweater",
+        "CollarSweater",
+        "GraphicShirt",
+        "Hoodie",
+        "Overall",
+        "ShirtCrewNeck",
+        "ShirtScoopNeck",
+        "ShirtVNeck"
+    ];
+
+    string[] private _eyeType = [
+        "Close",
+        "Cry",
+        "Default",
+        "Dizzy",
+        "EyeRoll",
+        "Happy",
+        "Hearts",
+        "Side",
+        "Squint",
+        "Surprised",
+        "Wink",
+        "WinkWacky"
+    ];
+
+    string[] private _eyebrowType = [
+        "Angry",
+        "AngryNatural",
+        "Default",
+        "DefaultNatural",
+        "FlatNatural",
+        "RaisedExcited",
+        "RaisedExcitedNatural",
+        "SadConcerned",
+        "SadConcernedNatural",
+        "UnibrowNatural",
+        "UpDown",
+        "UpDownNatural"
+    ];
+
+    string[] private _facialHairColor = [
+        "Auburn",
+        "Black",
+        "Blonde",
+        "BlondeGolden",
+        "Brown",
+        "BrownDark",
+        "Platinum",
+        "Red"
+    ];
+
+    string[] private _facialHairType = [
+        "Blank",
+        "BeardMedium",
+        "BeardLight",
+        "BeardMagestic",
+        "MoustacheFancy",
+        "MoustacheMagnum"
+    ];
+
+    string[] private _hairColor = [
+        "Auburn",
+        "Black",
+        "Blonde",
+        "BlondeGolden",
+        "Brown",
+        "BrownDark",
+        "PastelPink",
+        "Platinum",
+        "Red",
+        "SilverGray"
+    ];
+
+    string[] private _hatColor = [
+        "Black",
+        "Blue01",
+        "Blue02",
+        "Blue03",
+        "Gray01",
+        "Gray02",
+        "Heather",
+        "PastelBlue",
+        "PastelGreen",
+        "PastelOrange",
+        "PastelRed",
+        "PastelYellow",
+        "Pink",
+        "Red",
+        "White"
+    ];
+
+    string[] private _graphicType = [
+        "Bat",
+        "Cumbia",
+        "Deer",
+        "Diamond",
+        "Hola",
+        "Pizza",
+        "Resist",
+        "Selena",
+        "Bear",
+        "SkullOutline",
+        "Skull"
+    ];
+
+    string[] private _mouthType = [
+        "Concerned",
+        "Default",
+        "Disbelief",
+        "Eating",
+        "Grimace",
+        "Sad",
+        "ScreamOpen",
+        "Serious",
+        "Smile",
+        "Tongue",
+        "Twinkle",
+        "Vomit"
+    ];
+
+    string[] private _skinColor = [
+        "Tanned",
+        "Yellow",
+        "Pale",
+        "Light",
+        "Brown",
+        "DarkBrown",
+        "Black"
+    ];
+
+    string[] private _topType = [
+        "NoHair",
+        "Eyepatch",
+        "Hat",
+        "Hijab",
+        "Turban",
+        "WinterHat1",
+        "WinterHat2",
+        "WinterHat3",
+        "WinterHat4",
+        "LongHairBigHair",
+        "LongHairBob",
+        "LongHairBun",
+        "LongHairCurly",
+        "LongHairCurvy",
+        "LongHairDreads",
+        "LongHairFrida",
+        "LongHairFro",
+        "LongHairFroBand",
+        "LongHairNotTooLong",
+        "LongHairShavedSides",
+        "LongHairMiaWallace",
+        "LongHairStraight",
+        "LongHairStraight2",
+        "LongHairStraightStrand",
+        "ShortHairDreads01",
+        "ShortHairDreads02",
+        "ShortHairFrizzle",
+        "ShortHairShaggyMullet",
+        "ShortHairShortCurly",
+        "ShortHairShortFlat",
+        "ShortHairShortRound",
+        "ShortHairShortWaved",
+        "ShortHairSides",
+        "ShortHairTheCaesar",
+        "ShortHairTheCaesarSidePart"
+    ];
+
+    // TODO: Calculate DNA
+    function random(uint256 _tokenId, address _minter, uint256 _timestamp) internal pure returns(uint256)
+    {
+        uint256 _calc = _tokenId + uint160(_minter) + _timestamp;
+        bytes memory encodedParams = abi.encodePacked(_calc);
+        return uint256(keccak256(encodedParams));
+    }
+
+    // Get attributes
+    uint8 constant ADN_SECTION_SIZE = 2;
+
+    function _getDNASection(uint256 _dna, uint8 _rightDiscard)
+        private
+        pure
+        returns (uint8)
+    {
+        return
+            uint8(
+                (_dna % (1 * 10**(_rightDiscard + ADN_SECTION_SIZE))) /
+                    (1 * 10**_rightDiscard)
+            );
+    }
+
+    function getAccesoriesType(uint256 _dna)
+        internal
+        view
+        returns (string memory)
+    {
+        uint8 dnaSection = _getDNASection(_dna, 0);
+        return _accessoriesType[dnaSection % _accessoriesType.length];
+    }
+
+    function getClotheColor(uint256 _dna) internal view returns (string memory) {
+        uint8 dnaSection = _getDNASection(_dna, 2);
+        return _clotheColor[dnaSection % _clotheColor.length];
+    }
+
+    function getClotheType(uint256 _dna) internal view returns (string memory) {
+        uint256 dnaSection = _getDNASection(_dna, 4);
+        return _clotheType[dnaSection % _clotheType.length];
+    }
+
+    function getEyeType(uint256 _dna) internal view returns (string memory) {
+        uint256 dnaSection = _getDNASection(_dna, 6);
+        return _eyeType[dnaSection % _eyeType.length];
+    }
+
+    function getEyeBrowType(uint256 _dna) internal view returns (string memory) {
+        uint256 dnaSection = _getDNASection(_dna, 8);
+        return _eyebrowType[dnaSection % _eyebrowType.length];
+    }
+
+    function getFacialHairColor(uint256 _dna)
+        internal
+        view
+        returns (string memory)
+    {
+        uint256 dnaSection = _getDNASection(_dna, 10);
+        return _facialHairColor[dnaSection % _facialHairColor.length];
+    }
+
+    function getFacialHairType(uint256 _dna)
+        internal
+        view
+        returns (string memory)
+    {
+        uint256 dnaSection = _getDNASection(_dna, 12);
+        return _facialHairType[dnaSection % _facialHairType.length];
+    }
+
+    function getHairColor(uint256 _dna) internal view returns (string memory) {
+        uint256 dnaSection = _getDNASection(_dna, 14);
+        return _hairColor[dnaSection % _hairColor.length];
+    }
+
+    function getHatColor(uint256 _dna) internal view returns (string memory) {
+        uint256 dnaSection = _getDNASection(_dna, 16);
+        return _hatColor[dnaSection % _hatColor.length];
+    }
+
+    function getGraphicType(uint256 _dna) internal view returns (string memory) {
+        uint256 dnaSection = _getDNASection(_dna, 18);
+        return _graphicType[dnaSection % _graphicType.length];
+    }
+
+    function getMouthType(uint256 _dna) internal view returns (string memory) {
+        uint256 dnaSection = _getDNASection(_dna, 20);
+        return _mouthType[dnaSection % _mouthType.length];
+    }
+
+    function getSkinColor(uint256 _dna) internal view returns (string memory) {
+        uint256 dnaSection = _getDNASection(_dna, 22);
+        return _skinColor[dnaSection % _skinColor.length];
+    }
+
+    function getTopType(uint256 _dna) internal view returns (string memory) {
+        uint256 dnaSection = _getDNASection(_dna, 24);
+        return _topType[dnaSection % _topType.length];
+    }
+}
+
+
+// File contracts/Base64.sol
+
+
+pragma solidity ^0.8.4;
+
+/// @title Base64
+/// @author Brecht Devos - <brecht@loopring.org>
+/// @notice Provides a function for encoding some bytes in base64
+library Base64 {
+    string internal constant TABLE =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    function encode(bytes memory data) internal pure returns (string memory) {
+        if (data.length == 0) return "";
+
+        // load the table into memory
+        string memory table = TABLE;
+
+        // multiply by 4/3 rounded up
+        uint256 encodedLen = 4 * ((data.length + 2) / 3);
+
+        // add some extra buffer at the end required for the writing
+        string memory result = new string(encodedLen + 32);
+
+        assembly {
+            // set the actual output length
+            mstore(result, encodedLen)
+
+            // prepare the lookup table
+            let tablePtr := add(table, 1)
+
+            // input ptr
+            let dataPtr := data
+            let endPtr := add(dataPtr, mload(data))
+
+            // result ptr, jump over length
+            let resultPtr := add(result, 32)
+
+            // run over the input, 3 bytes at a time
+            for {
+
+            } lt(dataPtr, endPtr) {
+
+            } {
+                dataPtr := add(dataPtr, 3)
+
+                // read 3 bytes
+                let input := mload(dataPtr)
+
+                // write 4 characters
+                mstore(
+                    resultPtr,
+                    shl(248, mload(add(tablePtr, and(shr(18, input), 0x3F))))
+                )
+                resultPtr := add(resultPtr, 1)
+                mstore(
+                    resultPtr,
+                    shl(248, mload(add(tablePtr, and(shr(12, input), 0x3F))))
+                )
+                resultPtr := add(resultPtr, 1)
+                mstore(
+                    resultPtr,
+                    shl(248, mload(add(tablePtr, and(shr(6, input), 0x3F))))
+                )
+                resultPtr := add(resultPtr, 1)
+                mstore(
+                    resultPtr,
+                    shl(248, mload(add(tablePtr, and(input, 0x3F))))
+                )
+                resultPtr := add(resultPtr, 1)
+            }
+
+            // padding with '='
+            switch mod(mload(data), 3)
+            case 1 {
+                mstore(sub(resultPtr, 2), shl(240, 0x3d3d))
+            }
+            case 2 {
+                mstore(sub(resultPtr, 1), shl(248, 0x3d))
+            }
+        }
+
+        return result;
+    }
+}
+
+
+// File @openzeppelin/contracts/utils/Counters.sol@v4.7.3
+
+
+// OpenZeppelin Contracts v4.4.1 (utils/Counters.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @title Counters
+ * @author Matt Condon (@shrugs)
+ * @dev Provides counters that can only be incremented, decremented or reset. This can be used e.g. to track the number
+ * of elements in a mapping, issuing ERC721 ids, or counting request ids.
+ *
+ * Include with `using Counters for Counters.Counter;`
+ */
+library Counters {
+    struct Counter {
+        // This variable should never be directly accessed by users of the library: interactions must be restricted to
+        // the library's function. As of Solidity v0.5.2, this cannot be enforced, though there is a proposal to add
+        // this feature: see https://github.com/ethereum/solidity/issues/4637
+        uint256 _value; // default: 0
+    }
+
+    function current(Counter storage counter) internal view returns (uint256) {
+        return counter._value;
+    }
+
+    function increment(Counter storage counter) internal {
+        unchecked {
+            counter._value += 1;
+        }
+    }
+
+    function decrement(Counter storage counter) internal {
+        uint256 value = counter._value;
+        require(value > 0, "Counter: decrement overflow");
+        unchecked {
+            counter._value = value - 1;
+        }
+    }
+
+    function reset(Counter storage counter) internal {
+        counter._value = 0;
+    }
+}
+
+
+// File @openzeppelin/contracts/utils/Context.sol@v4.7.3
+
+
+// OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Provides information about the current execution context, including the
+ * sender of the transaction and its data. While these are generally available
+ * via msg.sender and msg.data, they should not be accessed in such a direct
+ * manner, since when dealing with meta-transactions the account sending and
+ * paying for execution may not be the actual sender (as far as an application
+ * is concerned).
+ *
+ * This contract is only required for intermediate, library-like contracts.
+ */
+abstract contract Context {
+    function _msgSender() internal view virtual returns (address) {
+        return msg.sender;
+    }
+
+    function _msgData() internal view virtual returns (bytes calldata) {
+        return msg.data;
+    }
+}
+
+
+// File @openzeppelin/contracts/access/Ownable.sol@v4.7.3
+
+
+// OpenZeppelin Contracts (last updated v4.7.0) (access/Ownable.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Contract module which provides a basic access control mechanism, where
+ * there is an account (an owner) that can be granted exclusive access to
+ * specific functions.
+ *
+ * By default, the owner account will be the one that deploys the contract. This
+ * can later be changed with {transferOwnership}.
+ *
+ * This module is used through inheritance. It will make available the modifier
+ * `onlyOwner`, which can be applied to your functions to restrict their use to
+ * the owner.
+ */
+abstract contract Ownable is Context {
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    constructor() {
+        _transferOwnership(_msgSender());
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        _checkOwner();
+        _;
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if the sender is not the owner.
+     */
+    function _checkOwner() internal view virtual {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Internal function without access restriction.
+     */
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
+}
+
+
+// File @openzeppelin/contracts/utils/Strings.sol@v4.7.3
+
+
+// OpenZeppelin Contracts (last updated v4.7.0) (utils/Strings.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev String operations.
+ */
+library Strings {
+    bytes16 private constant _HEX_SYMBOLS = "0123456789abcdef";
+    uint8 private constant _ADDRESS_LENGTH = 20;
+
+    /**
+     * @dev Converts a `uint256` to its ASCII `string` decimal representation.
+     */
+    function toString(uint256 value) internal pure returns (string memory) {
+        // Inspired by OraclizeAPI's implementation - MIT licence
+        // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
+
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
+    }
+
+    /**
+     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation.
+     */
+    function toHexString(uint256 value) internal pure returns (string memory) {
+        if (value == 0) {
+            return "0x00";
+        }
+        uint256 temp = value;
+        uint256 length = 0;
+        while (temp != 0) {
+            length++;
+            temp >>= 8;
+        }
+        return toHexString(value, length);
+    }
+
+    /**
+     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.
+     */
+    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {
+        bytes memory buffer = new bytes(2 * length + 2);
+        buffer[0] = "0";
+        buffer[1] = "x";
+        for (uint256 i = 2 * length + 1; i > 1; --i) {
+            buffer[i] = _HEX_SYMBOLS[value & 0xf];
+            value >>= 4;
+        }
+        require(value == 0, "Strings: hex length insufficient");
+        return string(buffer);
+    }
+
+    /**
+     * @dev Converts an `address` with fixed length of 20 bytes to its not checksummed ASCII `string` hexadecimal representation.
+     */
+    function toHexString(address addr) internal pure returns (string memory) {
+        return toHexString(uint256(uint160(addr)), _ADDRESS_LENGTH);
+    }
+}
+
 
 // File @openzeppelin/contracts/utils/introspection/IERC165.sol@v4.7.3
+
 
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/IERC165.sol)
 
@@ -30,6 +661,7 @@ interface IERC165 {
 
 
 // File @openzeppelin/contracts/token/ERC721/IERC721.sol@v4.7.3
+
 
 // OpenZeppelin Contracts (last updated v4.7.0) (token/ERC721/IERC721.sol)
 
@@ -175,6 +807,7 @@ interface IERC721 is IERC165 {
 
 // File @openzeppelin/contracts/token/ERC721/IERC721Receiver.sol@v4.7.3
 
+
 // OpenZeppelin Contracts (last updated v4.6.0) (token/ERC721/IERC721Receiver.sol)
 
 pragma solidity ^0.8.0;
@@ -203,35 +836,8 @@ interface IERC721Receiver {
 }
 
 
-// File @openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol@v4.7.3
-
-// OpenZeppelin Contracts v4.4.1 (token/ERC721/extensions/IERC721Metadata.sol)
-
-pragma solidity ^0.8.0;
-
-/**
- * @title ERC-721 Non-Fungible Token Standard, optional metadata extension
- * @dev See https://eips.ethereum.org/EIPS/eip-721
- */
-interface IERC721Metadata is IERC721 {
-    /**
-     * @dev Returns the token collection name.
-     */
-    function name() external view returns (string memory);
-
-    /**
-     * @dev Returns the token collection symbol.
-     */
-    function symbol() external view returns (string memory);
-
-    /**
-     * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
-     */
-    function tokenURI(uint256 tokenId) external view returns (string memory);
-}
-
-
 // File @openzeppelin/contracts/utils/Address.sol@v4.7.3
+
 
 // OpenZeppelin Contracts (last updated v4.7.0) (utils/Address.sol)
 
@@ -456,112 +1062,37 @@ library Address {
 }
 
 
-// File @openzeppelin/contracts/utils/Context.sol@v4.7.3
-
-// OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
-
-pragma solidity ^0.8.0;
-
-/**
- * @dev Provides information about the current execution context, including the
- * sender of the transaction and its data. While these are generally available
- * via msg.sender and msg.data, they should not be accessed in such a direct
- * manner, since when dealing with meta-transactions the account sending and
- * paying for execution may not be the actual sender (as far as an application
- * is concerned).
- *
- * This contract is only required for intermediate, library-like contracts.
- */
-abstract contract Context {
-    function _msgSender() internal view virtual returns (address) {
-        return msg.sender;
-    }
-
-    function _msgData() internal view virtual returns (bytes calldata) {
-        return msg.data;
-    }
-}
+// File @openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol@v4.7.3
 
 
-// File @openzeppelin/contracts/utils/Strings.sol@v4.7.3
-
-// OpenZeppelin Contracts (last updated v4.7.0) (utils/Strings.sol)
+// OpenZeppelin Contracts v4.4.1 (token/ERC721/extensions/IERC721Metadata.sol)
 
 pragma solidity ^0.8.0;
 
 /**
- * @dev String operations.
+ * @title ERC-721 Non-Fungible Token Standard, optional metadata extension
+ * @dev See https://eips.ethereum.org/EIPS/eip-721
  */
-library Strings {
-    bytes16 private constant _HEX_SYMBOLS = "0123456789abcdef";
-    uint8 private constant _ADDRESS_LENGTH = 20;
+interface IERC721Metadata is IERC721 {
+    /**
+     * @dev Returns the token collection name.
+     */
+    function name() external view returns (string memory);
 
     /**
-     * @dev Converts a `uint256` to its ASCII `string` decimal representation.
+     * @dev Returns the token collection symbol.
      */
-    function toString(uint256 value) internal pure returns (string memory) {
-        // Inspired by OraclizeAPI's implementation - MIT licence
-        // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
-
-        if (value == 0) {
-            return "0";
-        }
-        uint256 temp = value;
-        uint256 digits;
-        while (temp != 0) {
-            digits++;
-            temp /= 10;
-        }
-        bytes memory buffer = new bytes(digits);
-        while (value != 0) {
-            digits -= 1;
-            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
-            value /= 10;
-        }
-        return string(buffer);
-    }
+    function symbol() external view returns (string memory);
 
     /**
-     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation.
+     * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
      */
-    function toHexString(uint256 value) internal pure returns (string memory) {
-        if (value == 0) {
-            return "0x00";
-        }
-        uint256 temp = value;
-        uint256 length = 0;
-        while (temp != 0) {
-            length++;
-            temp >>= 8;
-        }
-        return toHexString(value, length);
-    }
-
-    /**
-     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.
-     */
-    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {
-        bytes memory buffer = new bytes(2 * length + 2);
-        buffer[0] = "0";
-        buffer[1] = "x";
-        for (uint256 i = 2 * length + 1; i > 1; --i) {
-            buffer[i] = _HEX_SYMBOLS[value & 0xf];
-            value >>= 4;
-        }
-        require(value == 0, "Strings: hex length insufficient");
-        return string(buffer);
-    }
-
-    /**
-     * @dev Converts an `address` with fixed length of 20 bytes to its not checksummed ASCII `string` hexadecimal representation.
-     */
-    function toHexString(address addr) internal pure returns (string memory) {
-        return toHexString(uint256(uint160(addr)), _ADDRESS_LENGTH);
-    }
+    function tokenURI(uint256 tokenId) external view returns (string memory);
 }
 
 
 // File @openzeppelin/contracts/utils/introspection/ERC165.sol@v4.7.3
+
 
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/ERC165.sol)
 
@@ -592,6 +1123,7 @@ abstract contract ERC165 is IERC165 {
 
 
 // File @openzeppelin/contracts/token/ERC721/ERC721.sol@v4.7.3
+
 
 // OpenZeppelin Contracts (last updated v4.7.0) (token/ERC721/ERC721.sol)
 
@@ -1048,6 +1580,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
 
 // File @openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol@v4.7.3
 
+
 // OpenZeppelin Contracts (last updated v4.5.0) (token/ERC721/extensions/IERC721Enumerable.sol)
 
 pragma solidity ^0.8.0;
@@ -1077,6 +1610,7 @@ interface IERC721Enumerable is IERC721 {
 
 
 // File @openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol@v4.7.3
+
 
 // OpenZeppelin Contracts v4.4.1 (token/ERC721/extensions/ERC721Enumerable.sol)
 
@@ -1240,584 +1774,52 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
 }
 
 
-// File @openzeppelin/contracts/utils/Counters.sol@v4.7.3
+// File contracts/PlatziPunkis.sol
 
-// OpenZeppelin Contracts v4.4.1 (utils/Counters.sol)
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
-/**
- * @title Counters
- * @author Matt Condon (@shrugs)
- * @dev Provides counters that can only be incremented, decremented or reset. This can be used e.g. to track the number
- * of elements in a mapping, issuing ERC721 ids, or counting request ids.
- *
- * Include with `using Counters for Counters.Counter;`
- */
-library Counters {
-    struct Counter {
-        // This variable should never be directly accessed by users of the library: interactions must be restricted to
-        // the library's function. As of Solidity v0.5.2, this cannot be enforced, though there is a proposal to add
-        // this feature: see https://github.com/ethereum/solidity/issues/4637
-        uint256 _value; // default: 0
-    }
 
-    function current(Counter storage counter) internal view returns (uint256) {
-        return counter._value;
-    }
 
-    function increment(Counter storage counter) internal {
-        unchecked {
-            counter._value += 1;
-        }
-    }
 
-    function decrement(Counter storage counter) internal {
-        uint256 value = counter._value;
-        require(value > 0, "Counter: decrement overflow");
-        unchecked {
-            counter._value = value - 1;
-        }
-    }
 
-    function reset(Counter storage counter) internal {
-        counter._value = 0;
-    }
-}
 
 
-// File @openzeppelin/contracts/access/Ownable.sol@v4.7.3
-
-// OpenZeppelin Contracts (last updated v4.7.0) (access/Ownable.sol)
-
-pragma solidity ^0.8.0;
-
-/**
- * @dev Contract module which provides a basic access control mechanism, where
- * there is an account (an owner) that can be granted exclusive access to
- * specific functions.
- *
- * By default, the owner account will be the one that deploys the contract. This
- * can later be changed with {transferOwnership}.
- *
- * This module is used through inheritance. It will make available the modifier
- * `onlyOwner`, which can be applied to your functions to restrict their use to
- * the owner.
- */
-abstract contract Ownable is Context {
-    address private _owner;
-
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-
-    /**
-     * @dev Initializes the contract setting the deployer as the initial owner.
-     */
-    constructor() {
-        _transferOwnership(_msgSender());
-    }
-
-    /**
-     * @dev Throws if called by any account other than the owner.
-     */
-    modifier onlyOwner() {
-        _checkOwner();
-        _;
-    }
-
-    /**
-     * @dev Returns the address of the current owner.
-     */
-    function owner() public view virtual returns (address) {
-        return _owner;
-    }
-
-    /**
-     * @dev Throws if the sender is not the owner.
-     */
-    function _checkOwner() internal view virtual {
-        require(owner() == _msgSender(), "Ownable: caller is not the owner");
-    }
-
-    /**
-     * @dev Leaves the contract without owner. It will not be possible to call
-     * `onlyOwner` functions anymore. Can only be called by the current owner.
-     *
-     * NOTE: Renouncing ownership will leave the contract without an owner,
-     * thereby removing any functionality that is only available to the owner.
-     */
-    function renounceOwnership() public virtual onlyOwner {
-        _transferOwnership(address(0));
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     * Can only be called by the current owner.
-     */
-    function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
-        _transferOwnership(newOwner);
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     * Internal function without access restriction.
-     */
-    function _transferOwnership(address newOwner) internal virtual {
-        address oldOwner = _owner;
-        _owner = newOwner;
-        emit OwnershipTransferred(oldOwner, newOwner);
-    }
-}
-
-
-// File @openzeppelin/contracts/utils/Base64.sol@v4.7.3
-
-// OpenZeppelin Contracts (last updated v4.7.0) (utils/Base64.sol)
-
-pragma solidity ^0.8.0;
-
-/**
- * @dev Provides a set of functions to operate with Base64 strings.
- *
- * _Available since v4.5._
- */
-library Base64 {
-    /**
-     * @dev Base64 Encoding/Decoding Table
-     */
-    string internal constant _TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-    /**
-     * @dev Converts a `bytes` to its Bytes64 `string` representation.
-     */
-    function encode(bytes memory data) internal pure returns (string memory) {
-        /**
-         * Inspired by Brecht Devos (Brechtpd) implementation - MIT licence
-         * https://github.com/Brechtpd/base64/blob/e78d9fd951e7b0977ddca77d92dc85183770daf4/base64.sol
-         */
-        if (data.length == 0) return "";
-
-        // Loads the table into memory
-        string memory table = _TABLE;
-
-        // Encoding takes 3 bytes chunks of binary data from `bytes` data parameter
-        // and split into 4 numbers of 6 bits.
-        // The final Base64 length should be `bytes` data length multiplied by 4/3 rounded up
-        // - `data.length + 2`  -> Round up
-        // - `/ 3`              -> Number of 3-bytes chunks
-        // - `4 *`              -> 4 characters for each chunk
-        string memory result = new string(4 * ((data.length + 2) / 3));
-
-        /// @solidity memory-safe-assembly
-        assembly {
-            // Prepare the lookup table (skip the first "length" byte)
-            let tablePtr := add(table, 1)
-
-            // Prepare result pointer, jump over length
-            let resultPtr := add(result, 32)
-
-            // Run over the input, 3 bytes at a time
-            for {
-                let dataPtr := data
-                let endPtr := add(data, mload(data))
-            } lt(dataPtr, endPtr) {
-
-            } {
-                // Advance 3 bytes
-                dataPtr := add(dataPtr, 3)
-                let input := mload(dataPtr)
-
-                // To write each character, shift the 3 bytes (18 bits) chunk
-                // 4 times in blocks of 6 bits for each character (18, 12, 6, 0)
-                // and apply logical AND with 0x3F which is the number of
-                // the previous character in the ASCII table prior to the Base64 Table
-                // The result is then added to the table to get the character to write,
-                // and finally write it in the result pointer but with a left shift
-                // of 256 (1 byte) - 8 (1 ASCII char) = 248 bits
-
-                mstore8(resultPtr, mload(add(tablePtr, and(shr(18, input), 0x3F))))
-                resultPtr := add(resultPtr, 1) // Advance
-
-                mstore8(resultPtr, mload(add(tablePtr, and(shr(12, input), 0x3F))))
-                resultPtr := add(resultPtr, 1) // Advance
-
-                mstore8(resultPtr, mload(add(tablePtr, and(shr(6, input), 0x3F))))
-                resultPtr := add(resultPtr, 1) // Advance
-
-                mstore8(resultPtr, mload(add(tablePtr, and(input, 0x3F))))
-                resultPtr := add(resultPtr, 1) // Advance
-            }
-
-            // When data `bytes` is not exactly 3 bytes long
-            // it is padded with `=` characters at the end
-            switch mod(mload(data), 3)
-            case 1 {
-                mstore8(sub(resultPtr, 1), 0x3d)
-                mstore8(sub(resultPtr, 2), 0x3d)
-            }
-            case 2 {
-                mstore8(sub(resultPtr, 1), 0x3d)
-            }
-        }
-
-        return result;
-    }
-}
-
-
-// File contracts/PlatziPunksDNA.sol
-pragma solidity ^0.8.0;
-
-contract PlatziPunksDNA {
-    string[] private _accessoriesType = [
-        "Blank",
-        "Kurt",
-        "Prescription01",
-        "Prescription02",
-        "Round",
-        "Sunglasses",
-        "Wayfarers"
-    ];
-
-    string[] private _clotheColor = [
-        "Black",
-        "Blue01",
-        "Blue02",
-        "Blue03",
-        "Gray01",
-        "Gray02",
-        "Heather",
-        "PastelBlue",
-        "PastelGreen",
-        "PastelOrange",
-        "PastelRed",
-        "PastelYellow",
-        "Pink",
-        "Red",
-        "White"
-    ];
-
-    string[] private _clotheType = [
-        "BlazerShirt",
-        "BlazerSweater",
-        "CollarSweater",
-        "GraphicShirt",
-        "Hoodie",
-        "Overall",
-        "ShirtCrewNeck",
-        "ShirtScoopNeck",
-        "ShirtVNeck"
-    ];
-
-    string[] private _eyeType = [
-        "Close",
-        "Cry",
-        "Default",
-        "Dizzy",
-        "EyeRoll",
-        "Happy",
-        "Hearts",
-        "Side",
-        "Squint",
-        "Surprised",
-        "Wink",
-        "WinkWacky"
-    ];
-
-    string[] private _eyebrowType = [
-        "Angry",
-        "AngryNatural",
-        "Default",
-        "DefaultNatural",
-        "FlatNatural",
-        "RaisedExcited",
-        "RaisedExcitedNatural",
-        "SadConcerned",
-        "SadConcernedNatural",
-        "UnibrowNatural",
-        "UpDown",
-        "UpDownNatural"
-    ];
-
-    string[] private _facialHairColor = [
-        "Auburn",
-        "Black",
-        "Blonde",
-        "BlondeGolden",
-        "Brown",
-        "BrownDark",
-        "Platinum",
-        "Red"
-    ];
-
-    string[] private _facialHairType = [
-        "Blank",
-        "BeardMedium",
-        "BeardLight",
-        "BeardMagestic",
-        "MoustacheFancy",
-        "MoustacheMagnum"
-    ];
-
-    string[] private _hairColor = [
-        "Auburn",
-        "Black",
-        "Blonde",
-        "BlondeGolden",
-        "Brown",
-        "BrownDark",
-        "PastelPink",
-        "Platinum",
-        "Red",
-        "SilverGray"
-    ];
-
-    string[] private _hatColor = [
-        "Black",
-        "Blue01",
-        "Blue02",
-        "Blue03",
-        "Gray01",
-        "Gray02",
-        "Heather",
-        "PastelBlue",
-        "PastelGreen",
-        "PastelOrange",
-        "PastelRed",
-        "PastelYellow",
-        "Pink",
-        "Red",
-        "White"
-    ];
-
-    string[] private _graphicType = [
-        "Bat",
-        "Cumbia",
-        "Deer",
-        "Diamond",
-        "Hola",
-        "Pizza",
-        "Resist",
-        "Selena",
-        "Bear",
-        "SkullOutline",
-        "Skull"
-    ];
-
-    string[] private _mouthType = [
-        "Concerned",
-        "Default",
-        "Disbelief",
-        "Eating",
-        "Grimace",
-        "Sad",
-        "ScreamOpen",
-        "Serious",
-        "Smile",
-        "Tongue",
-        "Twinkle",
-        "Vomit"
-    ];
-
-    string[] private _skinColor = [
-        "Tanned",
-        "Yellow",
-        "Pale",
-        "Light",
-        "Brown",
-        "DarkBrown",
-        "Black"
-    ];
-
-    string[] private _topType = [
-        "NoHair",
-        "Eyepatch",
-        "Hat",
-        "Hijab",
-        "Turban",
-        "WinterHat1",
-        "WinterHat2",
-        "WinterHat3",
-        "WinterHat4",
-        "LongHairBigHair",
-        "LongHairBob",
-        "LongHairBun",
-        "LongHairCurly",
-        "LongHairCurvy",
-        "LongHairDreads",
-        "LongHairFrida",
-        "LongHairFro",
-        "LongHairFroBand",
-        "LongHairNotTooLong",
-        "LongHairShavedSides",
-        "LongHairMiaWallace",
-        "LongHairStraight",
-        "LongHairStraight2",
-        "LongHairStraightStrand",
-        "ShortHairDreads01",
-        "ShortHairDreads02",
-        "ShortHairFrizzle",
-        "ShortHairShaggyMullet",
-        "ShortHairShortCurly",
-        "ShortHairShortFlat",
-        "ShortHairShortRound",
-        "ShortHairShortWaved",
-        "ShortHairSides",
-        "ShortHairTheCaesar",
-        "ShortHairTheCaesarSidePart"
-    ];
-
-    //this  pseudorandom function is deterministic and should not be used on production
-    function deterministicPseudoRandomDNA(uint256 _tokenId, address _minter)
-    public
-    pure
-    returns(uint256)
-    {
-        uint256 combinedParams =_tokenId + uint160(_minter);
-        bytes memory encodedParams = abi.encodePacked(combinedParams);
-        bytes32 hashedParams = keccak256(encodedParams);
-
-        return uint256(hashedParams);
-    }
-
-    //get attributes
-    uint8 constant ADN_SECTION_SIZE = 2;
-
-    function _getDNASection(uint256 _dna, uint8 _rightDiscard)
-        internal
-        pure
-        returns (uint8)
-    {
-        return uint8(
-            (_dna % (1 * 10**(_rightDiscard + ADN_SECTION_SIZE))) /
-            (1 * 10**_rightDiscard)
-        );
-    }
-
-   function getAccessoriesType(uint256 _dna)
-        public
-        view
-        returns (string memory)
-    {
-        uint8 dnaSection = _getDNASection(_dna, 0);
-        return _accessoriesType[dnaSection % _accessoriesType.length];
-    }
-
-    function getClotheColor(uint256 _dna) public view returns (string memory) {
-        uint8 dnaSection = _getDNASection(_dna, 2);
-        return _clotheColor[dnaSection % _clotheColor.length];
-    }
-
-    function getClotheType(uint256 _dna) public view returns (string memory) {
-        uint256 dnaSection = _getDNASection(_dna, 4);
-        return _clotheType[dnaSection % _clotheType.length];
-    }
-
-    function getEyeType(uint256 _dna) public view returns (string memory) {
-        uint256 dnaSection = _getDNASection(_dna, 6);
-        return _eyeType[dnaSection % _eyeType.length];
-    }
-
-    function getEyeBrowType(uint256 _dna) public view returns (string memory) {
-        uint256 dnaSection = _getDNASection(_dna, 8);
-        return _eyebrowType[dnaSection % _eyebrowType.length];
-    }
-
-    function getFacialHairColor(uint256 _dna)
-        public
-        view
-        returns (string memory)
-    {
-        uint256 dnaSection = _getDNASection(_dna, 10);
-        return _facialHairColor[dnaSection % _facialHairColor.length];
-    }
-
-    function getFacialHairType(uint256 _dna)
-        public
-        view
-        returns (string memory)
-    {
-        uint256 dnaSection = _getDNASection(_dna, 12);
-        return _facialHairType[dnaSection % _facialHairType.length];
-    }
-
-    function getHairColor(uint256 _dna) public view returns (string memory) {
-        uint256 dnaSection = _getDNASection(_dna, 14);
-        return _hairColor[dnaSection % _hairColor.length];
-    }
-
-    function getHatColor(uint256 _dna) public view returns (string memory) {
-        uint256 dnaSection = _getDNASection(_dna, 16);
-        return _hatColor[dnaSection % _hatColor.length];
-    }
-
-    function getGraphicType(uint256 _dna) public view returns (string memory) {
-        uint256 dnaSection = _getDNASection(_dna, 18);
-        return _graphicType[dnaSection % _graphicType.length];
-    }
-
-    function getMouthType(uint256 _dna) public view returns (string memory) {
-        uint256 dnaSection = _getDNASection(_dna, 20);
-        return _mouthType[dnaSection % _mouthType.length];
-    }
-
-    function getSkinColor(uint256 _dna) public view returns (string memory) {
-        uint256 dnaSection = _getDNASection(_dna, 22);
-        return _skinColor[dnaSection % _skinColor.length];
-    }
-
-    function getTopType(uint256 _dna) public view returns (string memory) {
-        uint256 dnaSection = _getDNASection(_dna, 24);
-        return _topType[dnaSection % _topType.length];
-    }
-}
-
-
-// File contracts/PlatziPunks.sol
-
-pragma solidity ^0.8.0;
-
-
-
-
-
-
-
-contract PlatziPunks is ERC721, ERC721Enumerable, Ownable, PlatziPunksDNA {
+contract PlatziPunkis is ERC721, ERC721Enumerable, Ownable, PlatziPunksDNA {
     using Counters for Counters.Counter;
-    using Strings for uint256;
+    using Strings for uint256; //sobrecargando funcionalidades
 
-    Counters.Counter private _idCounter;
     uint256 public maxSupply;
-    mapping(uint256 => uint256) public tokenDNA;
-    address _owner;
+    mapping(uint256 => uint256) private tokenDNA;
 
-    constructor(uint256 _maxSupply) ERC721("PlatziPunks", "PLZPNKS") {
-        maxSupply = _maxSupply;
-        _owner = msg.sender;
+    Counters.Counter private _tokenIdCounter;
+
+    constructor(uint256 _maxSupply) ERC721("PlatziPunks", "plpks") 
+    {
+        maxSupply= _maxSupply;
     }
 
     function mint() public {
-        // require(msg.value >= 0.1 ether, "Insuficient funds");
-        uint256 current = _idCounter.current();
-        require(current < maxSupply, "No PlatziPunks left :(");
-        tokenDNA[current] = deterministicPseudoRandomDNA(current, msg.sender);
-        // payable(_owner).transfer(msg.value);
-        _safeMint((msg.sender), current);
-        _idCounter.increment();
-
+        uint256 tokenId = _tokenIdCounter.current();
+        require(maxSupply>tokenId,"No PlatziPunks left to mint");
+        _tokenIdCounter.increment();
+        tokenDNA[tokenId] = random(tokenId, msg.sender, block.timestamp);
+        _safeMint(msg.sender, tokenId);
     }
 
-    function _baseURI() internal pure override returns(string memory) {
-        return "https://avataaars.io";
+
+    function _baseURI() internal pure override returns (string memory) {
+        return "https://avataaars.io/";
     }
 
-    function _paramsURI(uint256 _dna) internal view returns(string memory) {
+    function _paramsURI(uint256 _dna) private view returns (string memory) {
         string memory params;
-        params = string(
+
+        {
+            params = string(
                 abi.encodePacked(
                     "accessoriesType=",
-                    getAccessoriesType(_dna),
+                    getAccesoriesType(_dna),
                     "&clotheColor=",
                     getClotheColor(_dna),
                     "&clotheType=",
@@ -1842,7 +1844,16 @@ contract PlatziPunks is ERC721, ERC721Enumerable, Ownable, PlatziPunksDNA {
                     getSkinColor(_dna)
                 )
             );
-        return string(abi.encodePacked(params,  "&topType=", getTopType(_dna)));
+        }
+
+        return string(abi.encodePacked(params, "&topType=", getTopType(_dna)));
+    }
+
+    function imageByDNA(uint256 _dna) public view returns (string memory) {
+        string memory baseURI = _baseURI();
+        string memory paramsURI = _paramsURI(_dna);
+
+        return string(abi.encodePacked(baseURI, "?", paramsURI));
     }
 
     function tokenURI(uint256 tokenId)
@@ -1851,40 +1862,35 @@ contract PlatziPunks is ERC721, ERC721Enumerable, Ownable, PlatziPunksDNA {
         override
         returns (string memory)
     {
-        require(_exists(tokenId), "ERC721 Metadata: URI query for nonexistent token");
+        require(
+            _exists(tokenId),
+            "ERC721 Metadata: URI query for nonexistent token"
+        );
 
         uint256 dna = tokenDNA[tokenId];
         string memory image = imageByDNA(dna);
 
-       bytes memory jsonURI = abi.encodePacked(
-            '{ "name" : "Platzi Punks #', 
-            tokenId.toString(),
-            '", "description" : "Randomized Avatars", "image" : ',
-            image,
-            '"background_color": "80ed99"',
-             '"attributes": [{"Accessories Type": "" ,"Clothe Color": "","Clothe Type":"","Eye Type":"","Eye Brow Type":"","Facial Hair Color":"","Facial Hair Type":"","Hair Color":"","Hat Color":"","Graphic Type":"","Mouth Type":"","Skin Color":"","Top Type":"",}]',
-            '"}'
-        ); 
-
-        return string (
+        string memory jsonURI = Base64.encode(
             abi.encodePacked(
-                "data:application/json;base64,",
-                Base64.encode(jsonURI)
-            )   
+                '{ "name": "PlatziPunks #',
+                tokenId.toString(),
+                '", "description": "Platzi Punks are randomized Avataaars stored on chain", "image": "',
+                image,
+                '"}'
+            )
         );
-     }
 
-    function imageByDNA(uint256 _dna) public view returns (string memory) {
-        string memory baseURI = _baseURI();
-        string memory paramsURI = _paramsURI(_dna);
-
-        return string (abi.encodePacked(baseURI, "?", paramsURI));
+        return
+            string(abi.encodePacked("data:application/json;base64,", jsonURI));
     }
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override(ERC721, ERC721Enumerable) {
+
+
+    // The following functions are overrides required by Solidity.
+
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
